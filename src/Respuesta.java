@@ -2,9 +2,9 @@ public  class Respuesta {
     private boolean bandera;
     private int resultado_entero;
     private float resultado_decimal;
-
+    private String tipo_dato;
+    private String lexema;
     //Constructores
-
     public Respuesta() {
 
     }
@@ -19,9 +19,38 @@ public  class Respuesta {
         this.bandera = bandera;
         this.resultado_entero = resultado_entero;
     }
+    public Respuesta(boolean bandera, String tipo_dato) {
+        this.bandera = bandera;
+        this.tipo_dato = tipo_dato;
+    }
+    public Respuesta(boolean bandera, String tipo_dato, int resultado_entero) {
+        this.bandera = bandera;
+        this.tipo_dato = tipo_dato;
+        this.resultado_entero = resultado_entero;
+    }
+    public Respuesta(boolean bandera, String tipo_dato, float resultado_decimal) {
+        this.bandera = bandera;
+        this.tipo_dato = tipo_dato;
+        this.resultado_decimal = resultado_decimal;
+    }
 
+    public String getTipo_dato() {
+        return tipo_dato;
+    }
 
-    //gettters setters
+    public void setTipo_dato(String tipo_dato) {
+        this.tipo_dato = tipo_dato;
+    }
+
+    public String getLexema() {
+        return lexema;
+    }
+
+    public void setLexema(String lexema) {
+        this.lexema = lexema;
+    }
+
+//gettters setters
 
     public float getResultado_decimal() {
         return resultado_decimal;
@@ -49,10 +78,12 @@ public  class Respuesta {
 
     @Override
     public String toString() {
-        return "Modelos.Datos.Respuesta{" +
+        return "Respuesta{" +
                 "bandera=" + bandera +
                 ", resultado_entero=" + resultado_entero +
-                ", resulado_decimal=" + resultado_decimal +
+                ", resultado_decimal=" + resultado_decimal +
+                ", tipo_dato='" + tipo_dato + '\'' +
+                ", lexema='" + lexema + '\'' +
                 '}';
     }
 }

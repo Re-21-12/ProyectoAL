@@ -22,20 +22,19 @@ public class Lenguaje {
 
 
 
-    public ArrayList<Integer> sonVariablesEnterasValidas(ArrayList<String> variables) {
-        ArrayList<Integer> valores_enteros = new ArrayList<>();
-        for (String Lenguaje : variables) {
-            //Si es un valor valido y es un valor entero entonces
-            if (esUnaDeclaracionValida(texto).isBandera() && String.valueOf(esUnaDeclaracionValida(texto).getResultado_entero()).matches(numeros)) {
-
-                valores_enteros.add(esUnaDeclaracionValida(texto).getResultado_entero());
-            }
-        }
-        return valores_enteros;
+public Respuesta elLenguajeEsValido(String texto){
+    Respuesta respuesta = new Respuesta(false);
+    ArrayList<String> Lenguaje = new ArrayList<>(Arrays.asList(texto.split("(?<=;)")));
+    for (String lenguaje : Lenguaje) {
+        esUnaDeclaracionValida(lenguaje);
     }
-
+    respuesta.setBandera(!respuesta.isBandera());
+    return respuesta;
+}
+//
     public Respuesta esUnaDeclaracionValida(String Lenguaje) {
         Respuesta respuesta = new Respuesta();
+        respuesta.setLexema(Lenguaje);
         //en el caso de que venga un operador [* + -]
         Lenguaje = Lenguaje.trim();
         String[] lexemas = Lenguaje.split(" ");
@@ -45,14 +44,14 @@ public class Lenguaje {
         String valor = lexemas[3];
         //Validar el primer token
         if (!Lenguaje.startsWith("%")) {
-            System.out.println("Error: El Modelos.Datos.Lenguaje debe empezar con %");
+            System.out.println("Error: Lenguaje debe empezar con %");
             respuesta.setBandera(false);
             return respuesta;
         }
 
         //Eliminamos espacios vacios
         if (Lenguaje.isBlank() || Lenguaje.isEmpty()) {
-            System.out.println("Error: El Modelos.Datos.Lenguaje está vacío o en blanco");
+            System.out.println("Error: Lenguaje está vacío o en blanco");
             respuesta.setBandera(false);
             return respuesta;
         }
@@ -89,41 +88,53 @@ public class Lenguaje {
         valor = valor.substring(0, valor.length() - 1);
 
         //validar que el valor sea valido segun el tipo de dato entero
-        if (esUnValorValido(tipo_dato, valor) && valor.matches(numeros)) {
+        if (esUnValorValido(tipo_dato, valor).isBandera() && valor.matches(numeros)) {
             respuesta.setBandera(true);
             respuesta.setResultado_entero(Integer.parseInt(valor));
-            System.out.println(respuesta.getResultado_entero());
+            respuesta.setTipo_dato(tipo_dato);
+           // System.out.println("La respuesta es: "+ respuesta);
             return respuesta;
         }
         //En el caso de que no sea un entero necesariamente
-        respuesta.setBandera(esUnValorValido(tipo_dato, valor));
+        respuesta.setBandera(true);
         return respuesta;
     }
 
-    private boolean esUnValorValido(String tipo_dato, String valor) {
-        //Si el tipo de dato es int
+    private Respuesta esUnValorValido(String tipo_dato, String valor) {
+    Respuesta respuesta = new Respuesta(false);
+    //Si el tipo de dato es int
         if (tipo_dato.equalsIgnoreCase(tipos_datos[0])) {
+            //Si el valor no es un número despues de leer su declaracion
             if (!valor.matches(numeros)) {
                 System.out.println("Error: El valor no es un número válido");
-                return false;
+                return respuesta;
             }
+            //Si lo es ->
+            respuesta.setBandera(true);
+            respuesta.setTipo_dato(tipo_dato);
+            respuesta.setResultado_entero(Integer.parseInt(valor));
+            return respuesta;
         }
         //si el tipo de dato es bool
         if (tipo_dato.equalsIgnoreCase(tipos_datos[1])) {
             if (!valor.equals("true") && !valor.equals("false")) {
                 System.out.println("Error: El valor no es un booleano válido");
-                return false;
+                return respuesta;
             }
         }
         //si el tipo de dato es string valida que sea alfanumerico
         if (tipo_dato.equalsIgnoreCase(tipos_datos[2])) {
             if (!valor.matches(alfanumericos)) {
                 System.out.println("Error: El valor no es alfanumérico válido");
-                return false;
+                return respuesta;
             }
-        }
 
-        return true;
+        }
+        respuesta.setBandera(true);
+        respuesta.setTipo_dato(tipo_dato);
+        //En el caso de que no sea int pero si cualaquier tipo de dato
+        System.out.println("El valor es válido");
+        return respuesta;
     }
     //Constructores
     public Lenguaje() {
