@@ -4,6 +4,7 @@ public  class Respuesta {
     private float resultado_decimal;
     private String tipo_dato;
     private String lexema;
+    private String nombre_variable;
     //Constructores
     public Respuesta() {
 
@@ -76,6 +77,14 @@ public  class Respuesta {
         this.bandera = bandera;
     }
 
+    public String getNombre_variable() {
+        return nombre_variable;
+    }
+
+    public void setNombre_variable(String nombre_variable) {
+        this.nombre_variable = nombre_variable;
+    }
+
     @Override
     public String toString() {
         return "Respuesta{" +
@@ -84,6 +93,7 @@ public  class Respuesta {
                 ", resultado_decimal=" + resultado_decimal +
                 ", tipo_dato='" + tipo_dato + '\'' +
                 ", lexema='" + lexema + '\'' +
+                ", nombre_variable='" + nombre_variable + '\'' +
                 '}';
     }
 }
