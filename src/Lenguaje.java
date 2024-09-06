@@ -1,5 +1,6 @@
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
@@ -10,7 +11,8 @@ public class Lenguaje {
     protected String[] operadores = {"=", "+", "-", "*", "/"};
     protected String letras = "[a-z]+";
     protected String numeros = "[0-9]+";
-
+    protected String letrasyoperandos= "[a-z]+\\s*[+\\-*/]\\s*[a-z]+";
+    protected String variableregex = "^%int\\s+[a-z]+\\s*=\\s*[a-z]+\\s*([+\\-*/]\\s*[a-z]+)*\\s*;$";
     protected String texto;
     protected ArrayList<String> declaraciones = new ArrayList<>();
     protected Stack<String> expresionPostfija = new Stack<String>();
@@ -20,76 +22,51 @@ public class Lenguaje {
  */
     private boolean esValido;
 
-    public String elLenguajeEsValido(String texto) {
-        ArrayList<Respuesta> declaraciones = new ArrayList<>();
-        ArrayList<String> Lenguaje = new ArrayList<>(Arrays.asList(texto.split("(?<=;)")));
-        for (String lenguaje : Lenguaje) {
-            declaraciones.add(esUnaDeclaracionValida(lenguaje));
-        }
-        String nuevadeclaracion = operandoVariablesEnDeclaraciones(declaraciones, texto);
-        return nuevadeclaracion;
-    }
-    // Le deberia mandar un ArrayList<Respuesta> declaraciones con un contenido similar a "%int variableuno = 1;"
-    public String operandoVariablesEnDeclaraciones(ArrayList<Respuesta> declaraciones, String texto) {
-        ArrayList<Integer> valores_enteros = sonVariablesEnterasValidas(declaraciones);
-        //me devolvera: %int suma = 1 + 2;
-        return asignarValoresaResultado(valores_enteros, texto);
-    }
-    private String asignarValoresaResultado(ArrayList<Integer> valores_enteros, String variable_operacion) {
-        // Eliminar el punto y coma al final de la cadena
-        variable_operacion = variable_operacion.replace(";", "");
-        String[] lexemas = variable_operacion.split(" ");
+    public String extraerValoresDeclaraciones(ArrayList<Respuesta> declaraciones) {
+        StringBuilder variableRespuesta = new StringBuilder();
+        String[] lexemas;
 
-        // Inicializar un StringBuilder para construir el resultado
-        StringBuilder resultado = new StringBuilder();
-
-        // Agregar la parte inicial de la declaración (antes del signo '=')
-        for (int i = 0; i < 3; i++) {
-            resultado.append(lexemas[i]).append(" ");
-        }
-
-        // Inicializar un contador para los valores enteros
-        int valorIndex = 0;
-
-        // Procesar la parte después del signo '='
-        for (int i = 3; i < lexemas.length; i++) {
-            if (lexemas[i].matches(letras)) {
-                // Reemplazar los nombres de variables con valores de valores_enteros
-                resultado.append(valores_enteros.get(valorIndex++)).append(" ");
-            } else {
-                // Agregar operadores tal como están
-                resultado.append(lexemas[i]).append(" ");
+        // Construir la expresión con variables y operadores
+        for (Respuesta declaracion : declaraciones) {
+            if (declaracion.getLexema().matches(variableregex)) {
+                System.out.println("Variable a reemplazar: " + declaracion.getLexema());
+                variableRespuesta.append(declaracion.getLexema()).append(" ");
             }
         }
 
-        // Convertir el StringBuilder a String y devolver
-        return resultado.toString().trim();
-    }
-    public ArrayList<Integer> sonVariablesEnterasValidas(ArrayList<Respuesta> variables) {
-        ArrayList<Integer> valores_enteros = new ArrayList<>();
-        ArrayList<String> lexemas = new ArrayList<>();
-        //mapeamos los lexemas
-        for(Respuesta respuesta : variables){
-            lexemas.add(respuesta.getLexema());
-        }
-        //verificamos que sea un entero
-        for (String Lenguaje : lexemas) {
-            //Si es un valor valido y es un valor entero entonces
-            if (esUnaDeclaracionValida(texto).isBandera() && String.valueOf(esUnaDeclaracionValida(texto).getResultado_entero()).matches(numeros)) {
+        String variableRespuestaStr = variableRespuesta.toString().trim();
+        String asignacion;
 
-                valores_enteros.add(esUnaDeclaracionValida(texto).getResultado_entero());
+        // Separar la expresión en partes antes y después del signo '='
+        lexemas = variableRespuestaStr.split("=");
+        if (lexemas.length < 2) {
+            throw new IllegalArgumentException("La declaración no contiene un signo '=' para la asignación.");
+        }
+
+        asignacion = lexemas[1].trim();
+        System.out.println("Asignacion: " + asignacion);
+
+        // Reemplazar variables por sus valores en la expresión
+        for (Respuesta declaracion : declaraciones) {
+            if (asignacion.contains(declaracion.getNombre_variable())) {
+                System.out.println("Variable a reemplazar: " + declaracion.getNombre_variable());
+                asignacion = asignacion.replace(declaracion.getNombre_variable(), String.valueOf(declaracion.getResultado_entero()));
             }
         }
-        return valores_enteros;
+
+        variableRespuestaStr = lexemas[0].trim() + " = " + asignacion;
+
+        // Retornar la expresión con las variables reemplazadas
+        return variableRespuestaStr;
     }
 
 
 
-    //
     public Respuesta esUnaDeclaracionValida(String Lenguaje) {
         Respuesta respuesta = new Respuesta();
         respuesta.setLexema(Lenguaje);
         //en el caso de que venga un operador [* + -]
+        System.out.println("Lenguaje: " + Lenguaje);
         Lenguaje = Lenguaje.trim();
         String[] lexemas = Lenguaje.split(" ");
         String tipo_dato;
@@ -133,7 +110,8 @@ public class Lenguaje {
 
         //Validar que termine con ;
         if (!valor.endsWith(";")) {
-            System.out.println("Error: El valor no termina con ;");
+            System.out.println("Error: El valor no termina con ; " + Lenguaje);
+
             respuesta.setBandera(false);
             return respuesta;
         }
