@@ -11,16 +11,36 @@ public class Lenguaje {
     protected String[] operadores = {"=", "+", "-", "*", "/"};
     protected String letras = "[a-z]+";
     protected String numeros = "[0-9]+";
-    protected String letrasyoperandos= "[a-z]+\\s*[+\\-*/]\\s*[a-z]+";
+    protected String letrasyoperandos = "[a-z]+\\s*[+\\-*/]\\s*[a-z]+";
     protected String variableregex = "^%int\\s+[a-z]+\\s*=\\s*[a-z]+\\s*([+\\-*/]\\s*[a-z]+)*\\s*;$";
     protected String texto;
     protected ArrayList<String> declaraciones = new ArrayList<>();
     protected Stack<String> expresionPostfija = new Stack<String>();
-    /*
-     protected Nodo ArbolExpresion = new Nodo();
-     protected Arbol arbol = new Arbol();
- */
+    protected Nodo ArbolExpresion = new Nodo();
+    protected Arbol arbol = new Arbol();
+    protected Validacion validar = new Validacion();
     private boolean esValido;
+
+    public void esUnLenguajeValido(ArrayList<Respuesta> declaraciones) {
+
+        String resultado = operarAsignacion(extraerValoresDeclaraciones(declaraciones));
+        System.out.println("El resultado de operar declaraciones con variables es: " + resultado);
+    }
+
+    public String operarAsignacion(String declaracion_resultado) {
+        String[] lexemas = declaracion_resultado.split("=");
+        String operacion = lexemas[1].trim();
+        operacion = operacion.replace(";", "");
+        operacion = operacion.replace(" ", "");
+        System.out.println("Operación: " + operacion);
+        String resultado = "";
+        expresionPostfija = validar.conversionPostorden(operacion);
+        ArbolExpresion = arbol.ArbolExpresion(expresionPostfija);
+        resultado = validar.resultadoNotacionPolaca(ArbolExpresion);
+        System.out.println("El resultado de evaluar la Notación Polaca es: " + resultado);
+        declaracion_resultado = lexemas[0].trim() + " = " + resultado;
+        return declaracion_resultado;
+    }
 
     public String extraerValoresDeclaraciones(ArrayList<Respuesta> declaraciones) {
         StringBuilder variableRespuesta = new StringBuilder();
@@ -59,7 +79,6 @@ public class Lenguaje {
         // Retornar la expresión con las variables reemplazadas
         return variableRespuestaStr;
     }
-
 
 
     public Respuesta esUnaDeclaracionValida(String Lenguaje) {

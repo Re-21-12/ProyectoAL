@@ -36,9 +36,12 @@ public class Main {
         //declaraciones.add(Lenguaje_prueba1);
         //declaraciones.add(Lenguaje_prueba2);
         Lenguaje resultado = new Lenguaje(declaraciones);
+   /*
     String res = resultado.extraerValoresDeclaraciones(declaraciones_mapeadas);
-   System.out.println(res);
-            //System.out.println(res);
-
+   System.out.println();
+    resultado.operarAsignacion(res);
+            System.out.println(res);
+*/
+            resultado.esUnLenguajeValido(declaraciones_mapeadas);
     }
 }
