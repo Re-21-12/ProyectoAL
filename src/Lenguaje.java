@@ -11,8 +11,9 @@ public class Lenguaje {
     protected String[] operadores = {"=", "+", "-", "*", "/"};
     protected String letras = "[a-z]+";
     protected String numeros = "[0-9]+";
-    protected String letrasyoperandos = "[a-z]+\\s*[+\\-*/]\\s*[a-z]+";
     protected String variableregex = "^%int\\s+[a-z]+\\s*=\\s*[a-z]+\\s*([+\\-*/]\\s*[a-z]+)*\\s*;$";
+    protected String numerosoperandos = "^%int [a-z]+ = [0-9]+( [\\+\\-\\*/] [0-9]+)*;$";
+
     protected String texto;
     protected ArrayList<String> declaraciones = new ArrayList<>();
     protected Stack<String> expresionPostfija = new Stack<String>();
@@ -22,9 +23,19 @@ public class Lenguaje {
     private boolean esValido;
 
     public void esUnLenguajeValido(ArrayList<Respuesta> declaraciones) {
+        String variableConNumeros;
+        String resultado;
 
-        String resultado = operarAsignacion(extraerValoresDeclaraciones(declaraciones));
-        System.out.println("El resultado de operar declaraciones con variables es: " + resultado);
+        if(declaraciones.size() == 1 && declaraciones.get(0).getLexema().matches(numerosoperandos)){
+            variableConNumeros = declaraciones.get(0).getLexema();
+            resultado = operarAsignacion(variableConNumeros);
+            System.out.println("El resultado de operar declaraciones con variables es: " + resultado);
+
+        }
+        if(declaraciones.size() > 1){
+            resultado = operarAsignacion(extraerValoresDeclaraciones(declaraciones));
+            System.out.println("El resultado de operar declaraciones con variables es: " + resultado);
+        }
     }
 
     public String operarAsignacion(String declaracion_resultado) {
@@ -48,10 +59,17 @@ public class Lenguaje {
 
         // Construir la expresión con variables y operadores
         for (Respuesta declaracion : declaraciones) {
+
             if (declaracion.getLexema().matches(variableregex)) {
+                if(declaraciones.size() == 1){
+                    System.out.println("Error: Debe haber declarado como minimo dos variables con numeros");
+                    break;
+                }
                 System.out.println("Variable a reemplazar: " + declaracion.getLexema());
                 variableRespuesta.append(declaracion.getLexema()).append(" ");
+
             }
+
         }
 
         String variableRespuestaStr = variableRespuesta.toString().trim();
